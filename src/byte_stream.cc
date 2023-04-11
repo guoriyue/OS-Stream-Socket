@@ -1,6 +1,6 @@
+#include "byte_stream.hh"
 #include <stdexcept>
 #include <vector>
-#include "byte_stream.hh"
 
 using namespace std;
 
@@ -8,10 +8,9 @@ ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ), stream() {}
 
 void Writer::push( string data )
 {
-  uint64_t length_write = min(data.length(), capacity_ - stream.size());
-  for (uint64_t i = 0; i < length_write; i++)
-  {
-    stream.push_back(data[i]);
+  uint64_t length_write = min( data.length(), capacity_ - stream.size() );
+  for ( uint64_t i = 0; i < length_write; i++ ) {
+    stream.push_back( data[i] );
   }
   bytes_write += length_write;
 }
@@ -50,7 +49,7 @@ string_view Reader::peek() const
 bool Reader::is_finished() const
 {
   // Is the stream finished (closed and fully popped)?
-  return close_ && (bytes_write == bytes_read);
+  return close_ && ( bytes_write == bytes_read );
 }
 
 bool Reader::has_error() const
@@ -60,12 +59,11 @@ bool Reader::has_error() const
 
 void Reader::pop( uint64_t len )
 {
-  if (len > stream.size())
-  {
+  if ( len > stream.size() ) {
     error_ = true;
     return;
   }
-  stream.erase(stream.begin(), stream.begin() + len);
+  stream.erase( stream.begin(), stream.begin() + len );
   bytes_read += len;
 }
 
