@@ -8,6 +8,7 @@ ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ), stream() {}
 
 void Writer::push( string data )
 {
+  // push to buffer and update bytes_write, be careful about the available_capacity
   uint64_t length_write = min( data.length(), capacity_ - stream.size() );
   for ( uint64_t i = 0; i < length_write; i++ ) {
     stream.push_back( data[i] );
@@ -17,21 +18,25 @@ void Writer::push( string data )
 
 void Writer::close()
 {
+  // set close_ flag
   close_ = true;
 }
 
 void Writer::set_error()
 {
+  // set error_ flag
   error_ = true;
 }
 
 bool Writer::is_closed() const
 {
+  // get close_ flag
   return close_;
 }
 
 uint64_t Writer::available_capacity() const
 {
+  // the capacity left
   return capacity_ - stream.size();
 }
 
@@ -59,6 +64,7 @@ bool Reader::has_error() const
 
 void Reader::pop( uint64_t len )
 {
+  // pop len bytes from the buffer, set error_ to true if required to pop more bytes than the buffer size
   if ( len > stream.size() ) {
     error_ = true;
     return;
