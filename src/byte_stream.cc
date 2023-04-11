@@ -1,77 +1,81 @@
 #include <stdexcept>
-
+#include <vector>
 #include "byte_stream.hh"
 
 using namespace std;
 
-ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ) {}
+ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ), stream() {}
 
 void Writer::push( string data )
 {
-  // Your code here.
-  (void)data;
+  uint64_t length_write = min(data.length(), capacity_ - stream.size());
+  for (uint64_t i = 0; i < length_write; i++)
+  {
+    stream.push_back(data[i]);
+  }
+  bytes_write += length_write;
 }
 
 void Writer::close()
 {
-  // Your code here.
+  close_ = true;
 }
 
 void Writer::set_error()
 {
-  // Your code here.
+  error_ = true;
 }
 
 bool Writer::is_closed() const
 {
-  // Your code here.
-  return {};
+  return close_;
 }
 
 uint64_t Writer::available_capacity() const
 {
-  // Your code here.
-  return {};
+  return capacity_ - stream.size();
 }
 
 uint64_t Writer::bytes_pushed() const
 {
-  // Your code here.
-  return {};
+  return bytes_write;
 }
 
 string_view Reader::peek() const
 {
-  // Your code here.
-  return {};
+  // returning the entire buffer
+  return string_view { stream.data(), stream.size() };
 }
 
 bool Reader::is_finished() const
 {
-  // Your code here.
-  return {};
+  // Is the stream finished (closed and fully popped)?
+  return close_ && (bytes_write == bytes_read);
 }
 
 bool Reader::has_error() const
 {
-  // Your code here.
-  return {};
+  return error_;
 }
 
 void Reader::pop( uint64_t len )
 {
-  // Your code here.
-  (void)len;
+  if (len > stream.size())
+  {
+    error_ = true;
+    return;
+  }
+  stream.erase(stream.begin(), stream.begin() + len);
+  bytes_read += len;
 }
 
 uint64_t Reader::bytes_buffered() const
 {
-  // Your code here.
-  return {};
+  // Number of bytes currently buffered (pushed and not popped)
+  return bytes_write - bytes_read;
 }
 
 uint64_t Reader::bytes_popped() const
 {
-  // Your code here.
-  return {};
+  return bytes_read;
 }

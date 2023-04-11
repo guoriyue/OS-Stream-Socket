@@ -23,9 +23,9 @@ void get_URL( const string& host, const string& path )
   string message;
   while(!tcp_socket.eof())
   {
-    message += tcp_socket.read();
+    tcp_socket.read(message);
+    cout<<message;
   }
-  cout<<"message: "<<message<<endl;
 }
 
 int main( int argc, char* argv[] )
