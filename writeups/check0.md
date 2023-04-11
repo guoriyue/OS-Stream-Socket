@@ -7,7 +7,7 @@ My SUNet ID: mfguo
 
 I collaborated with: None
 
-I would like to credit/thank these classmates for their help: Thank everyone on Ed.
+I would like to credit/thank these classmates for their help: Thanks to everyone on Ed.
 
 This lab took me about 6 hours to do. I did not attend the lab session.
 
