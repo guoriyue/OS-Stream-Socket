@@ -53,6 +53,7 @@ this case, the offset should be added to the substring since
 it is truncated.
 
 Implementation Challenges:
+
 I think it's tricky to update base_index and move forward the
 assembling deque. I need to keep in mind the invariant that the 
 beginning of buffer represents the base_index. To put the substring 
