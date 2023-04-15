@@ -12,6 +12,7 @@ private:
   std::deque<char> buffer = {};
   std::deque<bool> flag = {};
   bool eof = false;
+
 public:
   /*
    * Insert a new substring to be reassembled into a ByteStream.
