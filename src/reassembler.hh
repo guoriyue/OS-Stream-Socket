@@ -6,6 +6,12 @@
 
 class Reassembler
 {
+private:
+  uint64_t base_index = 0;
+  uint64_t unassembled_size = 0;
+  std::deque<char> buffer = {};
+  std::deque<bool> flag = {};
+  bool eof = false;
 public:
   /*
    * Insert a new substring to be reassembled into a ByteStream.
