@@ -1,15 +1,15 @@
 Checkpoint 2 Writeup
 ====================
 
-My name: [your name here]
+My name: Mingfei Guo
 
-My SUNet ID: [your sunetid here]
+My SUNet ID: mfguo
 
-I collaborated with: [list sunetids here]
+I collaborated with: None
 
-I would like to thank/reward these classmates for their help: [list sunetids here]
+I would like to thank/reward these classmates for their help: Thanks to everyone on Ed.
 
-This lab took me about [n] hours to do. I [did/did not] attend the lab session.
+This lab took me about 8 hours to do. I did attend the lab session.
 
 Program Structure and Design of the TCPReceiver and wrap/unwrap routines:
 []
