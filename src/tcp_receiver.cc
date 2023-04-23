@@ -8,6 +8,24 @@ void TCPReceiver::receive( TCPSenderMessage message, Reassembler& reassembler, W
   (void)message;
   (void)reassembler;
   (void)inbound_stream;
+
+  // struct TCPSenderMessage
+  // {
+  //   Wrap32 seqno { 0 };
+  //   bool SYN { false };
+  //   Buffer payload {};
+  //   bool FIN { false };
+
+  //   // How many sequence numbers does this segment use?
+  //   size_t sequence_length() const { return SYN + payload.size() + FIN; }
+  // };
+
+
+  // // if SYN
+  // if (message.SYN && !isn) {
+  //   *isn = message.seqno;
+  // }
+
 }
 
 TCPReceiverMessage TCPReceiver::send( const Writer& inbound_stream ) const

@@ -6,10 +6,8 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
 {
   if ( buffer.empty() && flag.empty() ) {
     // initialization
-    for ( uint64_t i = 0; i < output.available_capacity(); i++ ) {
-      buffer.push_back( '\0' );
-      flag.push_back( false );
-    }
+    flag.insert(flag.end(), output.available_capacity(), false);
+    buffer.insert(buffer.end(), output.available_capacity(), '\0');
   }
 
   uint64_t start_index = max( base_index, first_index );
@@ -38,13 +36,17 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
   }
 
   string tmp = "";
+  long unsigned int cnt = 0;
+  while ( cnt < flag.size() && flag[cnt] ) {
+    tmp += buffer[cnt];
+    cnt ++;
+  }
 
-  while ( !flag.empty() && flag[0] ) {
-    tmp += buffer[0];
-    flag.pop_front();
-    flag.push_back( false );
-    buffer.pop_front();
-    buffer.push_back( '\0' );
+  if (cnt) {
+    flag.erase(flag.begin(), flag.begin() + cnt);
+    flag.insert(flag.end(), cnt, false);
+    buffer.erase(buffer.begin(), buffer.begin() + cnt);
+    buffer.insert(buffer.end(), cnt, '\0');
   }
 
   if ( tmp.length() > 0 ) {
