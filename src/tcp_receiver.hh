@@ -7,10 +7,10 @@
 
 class TCPReceiver
 {
-// private:
-//   Wrap32* isn = NULL;
-//   uint64_t* fin_abs_seqno = NULL;
-//   uint64_t* ack_abs_seqno = NULL;
+private:
+  Wrap32 isn = Wrap32(0);
+  bool fin = false;
+  bool syn = false;
 
 public:
   /*

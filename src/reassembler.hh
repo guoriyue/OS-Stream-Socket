@@ -12,6 +12,7 @@ private:
   std::deque<char> buffer = {};
   std::deque<bool> flag = {};
   bool eof = false;
+  bool initialized = false;
 
 public:
   /*

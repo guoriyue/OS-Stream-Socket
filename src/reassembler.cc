@@ -4,11 +4,17 @@ using namespace std;
 
 void Reassembler::insert( uint64_t first_index, string data, bool is_last_substring, Writer& output )
 {
-  if ( buffer.empty() && flag.empty() ) {
-    // initialization
+  // mentioned in lab: it would be fine to allocate some fixed size thing based on the first time the writer is called
+  if (!initialized) {
     flag.insert(flag.end(), output.available_capacity(), false);
     buffer.insert(buffer.end(), output.available_capacity(), '\0');
+    initialized = true;
   }
+  // if ( buffer.empty() && flag.empty() ) {
+  //   // initialization
+  //   flag.insert(flag.end(), output.available_capacity(), false);
+  //   buffer.insert(buffer.end(), output.available_capacity(), '\0');
+  // }
 
   uint64_t start_index = max( base_index, first_index );
   uint64_t end_index = min( base_index + output.available_capacity(), first_index + data.size() );
