@@ -60,8 +60,6 @@ TCPReceiverMessage TCPReceiver::send( const Writer& inbound_stream ) const
     last_ack_abs_seqno ++;
   }
 
-  // segment with FIN (but can't be assembled yet)
-
   uint64_t window_size = inbound_stream.available_capacity();
 
   if (window_size >= 65536) {
