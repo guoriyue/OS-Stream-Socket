@@ -9,16 +9,18 @@ I collaborated with: None
 
 I would like to thank/reward these classmates for their help: Thanks to everyone on Ed.
 
-This lab took me about 8 hours to do. I did attend the lab session.
+This lab took me about 12 hours to do. I did attend the lab session.
 
 Program Structure and Design of the TCPReceiver and wrap/unwrap routines:
 []
 
 Implementation Challenges:
-[]
+
+When inplementing wrap/unwrap, I need to compute seqno - isn to get the
+absolute seqno.
 
 Remaining Bugs:
-[]
+None.
 
 - Optional: I had unexpected difficulty with: [describe]
 
