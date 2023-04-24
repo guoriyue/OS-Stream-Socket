@@ -27,7 +27,7 @@ uint64_t Wrap32::unwrap( Wrap32 zero_point, uint64_t checkpoint ) const
   uint64_t tmp = 0;
   // Can't use absolute_delta here!
   if ( seqno < isn ) {
-    tmp = ( 1ll << 32 ) - (isn - seqno);
+    tmp = ( 1ll << 32 ) - ( isn - seqno );
   } else {
     tmp = seqno - isn;
   }
@@ -35,17 +35,16 @@ uint64_t Wrap32::unwrap( Wrap32 zero_point, uint64_t checkpoint ) const
   uint64_t last_tmp = tmp;
 
   if ( tmp >= checkpoint ) {
-    uint32_t mod = (tmp - checkpoint) % ( 1ll << 32 );
+    uint32_t mod = ( tmp - checkpoint ) % ( 1ll << 32 );
     tmp = checkpoint + mod;
     last_tmp = tmp - ( 1ll << 32 );
-  }
-  else {
-    uint32_t mod = (checkpoint - tmp) % ( 1ll << 32 );
+  } else {
+    uint32_t mod = ( checkpoint - tmp ) % ( 1ll << 32 );
     tmp = checkpoint - mod;
     last_tmp = tmp + ( 1ll << 32 );
   }
-  
-  if ( absolute_delta(checkpoint, last_tmp) < absolute_delta(checkpoint, tmp) ) {
+
+  if ( absolute_delta( checkpoint, last_tmp ) < absolute_delta( checkpoint, tmp ) ) {
     return last_tmp;
   } else {
     return tmp;

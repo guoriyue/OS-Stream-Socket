@@ -8,7 +8,7 @@
 class TCPReceiver
 {
 private:
-  Wrap32 isn = Wrap32(0);
+  Wrap32 isn = Wrap32( 0 );
   bool fin = false;
   bool syn = false;
 
