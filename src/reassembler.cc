@@ -53,13 +53,25 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
     flag.insert(flag.end(), cnt, false);
     buffer.erase(buffer.begin(), buffer.begin() + cnt);
     buffer.insert(buffer.end(), cnt, '\0');
+
+    output.push( tmp );
+    unassembled_size -= cnt;
+    base_index += cnt;
   }
 
-  if ( tmp.length() > 0 ) {
-    output.push( tmp );
-    unassembled_size -= tmp.length();
-    base_index += tmp.length();
-  }
+  // while ( flag.size() && flag.front() ) {
+  //   tmp += buffer.front();
+  //   buffer.pop_front();
+  //   flag.pop_front();
+  //   buffer.push_back('\0');
+  //   flag.push_back(false);
+  // }
+
+  // if ( tmp.length() > 0 ) {
+  //   output.push( tmp );
+  //   unassembled_size -= tmp.length();
+  //   base_index += tmp.length();
+  // }
 
   if ( is_last_substring ) {
     // is_last_substring maybe cycles ahead of finishing assembling

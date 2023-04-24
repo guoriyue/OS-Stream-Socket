@@ -9,8 +9,8 @@ class Reassembler
 private:
   uint64_t base_index = 0;
   uint64_t unassembled_size = 0;
-  std::deque<char> buffer = {};
-  std::deque<bool> flag = {};
+  std::vector<char> buffer = {};
+  std::vector<bool> flag = {};
   bool eof = false;
   bool initialized = false;
 
