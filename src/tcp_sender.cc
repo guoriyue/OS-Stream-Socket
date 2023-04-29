@@ -22,23 +22,34 @@ uint64_t TCPSender::consecutive_retransmissions() const
 
 optional<TCPSenderMessage> TCPSender::maybe_send()
 {
-  // Your code here.
-  return {};
+  if (send_messages_.empty()) {
+    return nullopt;
+  }
+  return make_optional<TCPSenderMessage>(send_messages_.front());
 }
 
 void TCPSender::push( Reader& outbound_stream )
 {
-  // generates as many TCPSenderMessages as possible, as long as there 
-  // are new bytes to be read and space available in the window
+  if(outbound_stream.bytes_buffered())
+  {
+    while (receiver_window_space_ && outbound_stream.bytes_buffered()) {
+      TCPSenderMessage sender_message;
+      sender_message.payload = Buffer(outbound_stream.peek());
+      if (outbound_stream.is_finished() && receiver_window_space_ > sender_message.payload.length())
+      {
+        sender_message.fin = true;
+      }
 
-  // // Your code here.
-  // (void)outbound_stream;
+      sender_message.seqno = Wrap32(0).wrap(next_abs_seqno_, isn_);
+      next_abs_seqno_ += sender_message.sequence_length();
+      sequence_numbers_in_flight_ += sender_message.sequence_length();
+      receiver_window_space_ -= sender_message.sequence_length();
 
-  TCPSenderMessage sender_message;
-  sender_message.payload = Buffer(outbound_stream.peek());
+      send_messages_.push_back(sender_message);
+      outstanding_messages_.push_back(sender_message);
+    }
+  }
 
-  // outbound_stream.pop()
-  // std::string_view outbound_stream.peek()
 }
 
 TCPSenderMessage TCPSender::send_empty_message() const
@@ -53,6 +64,28 @@ TCPSenderMessage TCPSender::send_empty_message() const
 void TCPSender::receive( const TCPReceiverMessage& msg )
 {
   uint64_t abs_ackno = Wrap32(msg.ackno).unwrap(isn_, next_abs_seqno_);
+  receiver_window_size_ = msg.window_size;
+  receiver_window_space_ = msg.window_size;
+
+  int idx = 0;
+  while (idx < outstanding_messages_.size()){
+    TCPSenderMessage sender_message = outstanding_messages_[idx];
+    uint64_t sender_message_abs_ackno = sender_message.seqno.unwrap(isn_, next_abs_seqno_);
+    if (sender_message_abs_ackno<=abs_ackno){
+      sequence_numbers_in_flight_ -= sender_message.sequence_length();
+      idx += 1
+    }
+    else{
+      break;
+    }
+  }
+  if (idx){
+    time_elapsed_ = 0;
+    retransmission_timeout_ = initial_RTO_ms_;
+    consecutive_retransmissions_ = 0;
+    outstanding_messages_.erase( outstanding_messages_.begin(), outstanding_messages_.begin() + idx );
+  }
+
 }
 
 void TCPSender::tick( const size_t ms_since_last_tick )
@@ -78,9 +111,6 @@ void TCPSender::tick( const size_t ms_since_last_tick )
 //   // How many sequence numbers does this segment use?
 //   size_t sequence_length() const { return SYN + payload.size() + FIN; }
 // };
-
-
-
 
 
 // struct TCPReceiverMessage

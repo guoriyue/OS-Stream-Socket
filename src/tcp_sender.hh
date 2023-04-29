@@ -18,6 +18,10 @@ class TCPSender
   uint64_t consecutive_retransmissions_ = 0;
   uint64_t retransmission_timeout_= 0;
 
+
+  uint16_t receiver_window_size_ = 0; // receiver window size int16
+  uint16_t receiver_window_space_ = 0;
+
   size_t time_elapsed_ = 0;
 
     
