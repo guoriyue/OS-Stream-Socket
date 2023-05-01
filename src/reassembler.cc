@@ -17,13 +17,12 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
   //   buffer.insert(buffer.end(), output.available_capacity(), '\0');
   // }
 
-
   uint64_t start_index = max( base_index, first_index );
   uint64_t end_index = min( base_index + output.available_capacity(), first_index + data.size() );
   uint64_t len = end_index - start_index;
 
   if ( first_index > base_index ) {
-    for ( uint64_t i = 0; i < min(len, data.size()); i++ ) {
+    for ( uint64_t i = 0; i < min( len, data.size() ); i++ ) {
       if ( flag[i + first_index - base_index] == false ) {
         flag[i + first_index - base_index] = true;
         buffer[i + first_index - base_index] = data[i];
@@ -33,7 +32,7 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
   } else {
     // first_index < base_index, need to truncate
     if ( first_index + data.size() > base_index ) {
-      for ( uint64_t i = 0; i < min(len, flag.size()); i++ ) {
+      for ( uint64_t i = 0; i < min( len, flag.size() ); i++ ) {
         if ( flag[i] == false ) {
           flag[i] = true;
           buffer[i] = data[i + base_index - first_index];
@@ -42,14 +41,14 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
       }
     }
   }
-  
+
   string tmp = "";
   long unsigned int cnt = 0;
   while ( cnt < flag.size() && flag[cnt] ) {
     tmp += buffer[cnt];
     cnt++;
   }
-  
+
   if ( cnt ) {
     flag.erase( flag.begin(), flag.begin() + cnt );
     flag.insert( flag.end(), cnt, false );
