@@ -50,4 +50,7 @@ public:
   /* Accessors for use in testing */
   uint64_t sequence_numbers_in_flight() const;  // How many sequence numbers are outstanding?
   uint64_t consecutive_retransmissions() const; // How many consecutive *re*transmissions have happened?
+
+  /* Helper function to update TCPSender status after sending sender_message. */
+  void update_status( TCPSenderMessage sender_message );
 };
