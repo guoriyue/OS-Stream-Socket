@@ -41,6 +41,8 @@ private:
   // IP (known as Internet-layer or network-layer) address of the interface
   Address ip_address_;
 
+  queue<EthernetFrame> maybe_send_queue = {};
+
 public:
   // Construct a network interface with given Ethernet (network-access-layer) and IP (internet-layer)
   // addresses
