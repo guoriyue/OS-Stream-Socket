@@ -1,6 +1,7 @@
 #pragma once
 
 #include "address.hh"
+#include "arp_message.hh"
 #include "ethernet_frame.hh"
 #include "ipv4_datagram.hh"
 
@@ -76,4 +77,15 @@ public:
   optional<pair<queue<InternetDatagram>, uint32_t>> map_ip_addr_to_ethernet_datagram_queue( uint32_t ip_addr );
 
   void update_maps( uint32_t ip_addr, EthernetAddress MAC_address );
+
+  EthernetFrame make_frame( const EthernetAddress& src,
+                            const EthernetAddress& dst,
+                            const uint16_t type,
+                            vector<Buffer> payload );
+
+  ARPMessage make_arp( const uint16_t opcode,
+                       const EthernetAddress sender_ethernet_address,
+                       const uint32_t sender_ip_address,
+                       const EthernetAddress target_ethernet_address,
+                       const uint32_t target_ip_address );
 };

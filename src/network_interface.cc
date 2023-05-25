@@ -15,6 +15,34 @@ NetworkInterface::NetworkInterface( const EthernetAddress& ethernet_address, con
        << ip_address.ip() << "\n";
 }
 
+EthernetFrame NetworkInterface::make_frame( const EthernetAddress& src,
+                                            const EthernetAddress& dst,
+                                            const uint16_t type,
+                                            vector<Buffer> payload )
+{
+  EthernetFrame frame;
+  frame.header.src = src;
+  frame.header.dst = dst;
+  frame.header.type = type;
+  frame.payload = std::move( payload );
+  return frame;
+}
+
+ARPMessage NetworkInterface::make_arp( const uint16_t opcode,
+                                       const EthernetAddress sender_ethernet_address,
+                                       const uint32_t sender_ip_address,
+                                       const EthernetAddress target_ethernet_address,
+                                       const uint32_t target_ip_address )
+{
+  ARPMessage arp;
+  arp.opcode = opcode;
+  arp.sender_ethernet_address = sender_ethernet_address;
+  arp.sender_ip_address = sender_ip_address;
+  arp.target_ethernet_address = target_ethernet_address;
+  arp.target_ip_address = target_ip_address;
+  return arp;
+}
+
 // dgram: the IPv4 datagram to be sent
 // next_hop: the IP address of the interface to send it to (typically a router or default gateway, but
 // may also be another host if directly connected to the same network as the destination)
@@ -26,12 +54,9 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
   uint32_t next_hop_ip = next_hop.ipv4_numeric();
   optional<pair<EthernetAddress, uint32_t>> MAC_address = map_ip_addr_to_ethernet_addr( next_hop_ip );
   if ( MAC_address.has_value() ) {
-    EthernetFrame frame;
-    frame.header.type = EthernetHeader::TYPE_IPv4;
-    frame.header.src = ethernet_address_; // EthernetAddress
-    frame.header.dst = MAC_address.value().first;
+    EthernetFrame frame
+      = make_frame( ethernet_address_, MAC_address.value().first, EthernetHeader::TYPE_IPv4, serialize( dgram ) );
 
-    frame.payload = serialize( dgram );
     maybe_send_queue.push( frame );
   } else {
     optional<pair<queue<InternetDatagram>, uint32_t>> ethernet_datagram_queue
@@ -41,7 +66,7 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
       ethernet_datagram_queue.value().first.push( dgram );
       if ( ethernet_datagram_queue.value().second >= 5000 ) {
         // If the network interface already sent an ARP request about the same IP address in the last
-        //  five seconds, don’t send a second request—just wait for a reply to the first one.
+        // five seconds, don’t send a second request—just wait for a reply to the first one.
         ARP_request = true;
       }
     } else {
@@ -52,17 +77,11 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
       ARP_request = true;
     }
     if ( ARP_request ) {
-      EthernetFrame frame;
-      frame.header.type = EthernetHeader::TYPE_ARP;
-      frame.header.src = ethernet_address_;
-      frame.header.dst = ETHERNET_BROADCAST;
 
-      ARPMessage send_ARP;
-      send_ARP.opcode = ARPMessage::OPCODE_REQUEST;
-      send_ARP.sender_ethernet_address = ethernet_address_;
-      send_ARP.sender_ip_address = ip_address_.ipv4_numeric();
-      send_ARP.target_ip_address = next_hop_ip;
-      frame.payload = serialize( send_ARP );
+      ARPMessage send_ARP
+        = make_arp( ARPMessage::OPCODE_REQUEST, ethernet_address_, ip_address_.ipv4_numeric(), {}, next_hop_ip );
+      EthernetFrame frame
+        = make_frame( ethernet_address_, ETHERNET_BROADCAST, EthernetHeader::TYPE_ARP, serialize( send_ARP ) );
       maybe_send_queue.push( frame );
     }
   }
@@ -108,12 +127,8 @@ void NetworkInterface::update_maps( uint32_t ip_addr, EthernetAddress MAC_addres
     while ( !iter2->second.first.empty() ) {
       InternetDatagram dgram = iter2->second.first.front();
       iter2->second.first.pop();
-      EthernetFrame frame;
-      frame.header.type = EthernetHeader::TYPE_IPv4;
-      frame.header.src = ethernet_address_; // EthernetAddress
-      frame.header.dst = MAC_address;
-
-      frame.payload = serialize( dgram );
+      EthernetFrame frame
+        = make_frame( ethernet_address_, MAC_address, EthernetHeader::TYPE_IPv4, serialize( dgram ) );
       maybe_send_queue.push( frame );
     }
   }
@@ -141,18 +156,14 @@ optional<InternetDatagram> NetworkInterface::recv_frame( const EthernetFrame& fr
       if ( recv_ARP.opcode == ARPMessage::OPCODE_REQUEST
            && recv_ARP.target_ip_address == ip_address_.ipv4_numeric() ) {
         // send reply
-        EthernetFrame send_frame;
-        send_frame.header.type = EthernetHeader::TYPE_ARP;
-        send_frame.header.src = ethernet_address_;
-        send_frame.header.dst = recv_ARP.sender_ethernet_address;
-        ARPMessage reply_ARP;
+        ARPMessage reply_ARP = make_arp( ARPMessage::OPCODE_REPLY,
+                                         ethernet_address_,
+                                         ip_address_.ipv4_numeric(),
+                                         recv_ARP.sender_ethernet_address,
+                                         recv_ARP.sender_ip_address );
 
-        reply_ARP.opcode = ARPMessage::OPCODE_REPLY;
-        reply_ARP.sender_ethernet_address = ethernet_address_;
-        reply_ARP.sender_ip_address = ip_address_.ipv4_numeric();
-        reply_ARP.target_ethernet_address = recv_ARP.sender_ethernet_address;
-        reply_ARP.target_ip_address = recv_ARP.sender_ip_address;
-        send_frame.payload = serialize( reply_ARP );
+        EthernetFrame send_frame = make_frame(
+          ethernet_address_, recv_ARP.sender_ethernet_address, EthernetHeader::TYPE_ARP, serialize( reply_ARP ) );
         maybe_send_queue.push( send_frame );
       }
     }
