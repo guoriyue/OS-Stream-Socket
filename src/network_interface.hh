@@ -6,11 +6,13 @@
 
 #include <iostream>
 #include <list>
+#include <map>
 #include <optional>
 #include <queue>
 #include <unordered_map>
 #include <utility>
 
+using namespace std;
 // A "network interface" that connects IP (the internet layer, or network layer)
 // with Ethernet (the network access layer, or link layer).
 
@@ -43,6 +45,9 @@ private:
 
   queue<EthernetFrame> maybe_send_queue = {};
 
+  map<uint32_t, pair<queue<InternetDatagram>, uint32_t>> ip_addr_to_ethernet_datagram_queue = {};
+  map<uint32_t, pair<EthernetAddress, uint32_t>> ip_addr_to_ethernet_addr = {};
+
 public:
   // Construct a network interface with given Ethernet (network-access-layer) and IP (internet-layer)
   // addresses
@@ -66,4 +71,9 @@ public:
 
   // Called periodically when time elapses
   void tick( size_t ms_since_last_tick );
+
+  optional<pair<EthernetAddress, uint32_t>> map_ip_addr_to_ethernet_addr( uint32_t ip_addr );
+  optional<pair<queue<InternetDatagram>, uint32_t>> map_ip_addr_to_ethernet_datagram_queue( uint32_t ip_addr );
+
+  void update_maps( uint32_t ip_addr, EthernetAddress MAC_address );
 };
