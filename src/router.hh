@@ -48,12 +48,34 @@ public:
   }
 };
 
+class RouteRecord
+{
+  public:
+    const uint32_t mask = 0;
+    const uint32_t route_prefix_;
+    const uint8_t prefix_length_;
+    const optional<Address> next_hop_;
+    const size_t interface_num_;
+    RouteRecord (uint32_t route_prefix, uint8_t prefix_length, optional<Address> next_hop, size_t interface_num)
+    {
+      route_prefix_ = route_prefix;
+      prefix_length_ = prefix_length;
+      next_hop_ = next_hop;
+      interface_num_ = interface_num;
+      if(prefix_length!=0){
+        mask = ((1 << (prefix_length)) - 1) << (32 - prefix_length);
+      }
+    }
+};
+
 // A router that has multiple network interfaces and
 // performs longest-prefix-match routing between them.
 class Router
 {
   // The router's collection of network interfaces
   std::vector<AsyncNetworkInterface> interfaces_ {};
+
+  std::vector<RouteRecord> route_table_ = {};
 
 public:
   // Add an interface to the router
