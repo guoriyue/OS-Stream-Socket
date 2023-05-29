@@ -50,22 +50,22 @@ public:
 
 class RouteRecord
 {
-  public:
-    const uint32_t mask = 0;
-    const uint32_t route_prefix_;
-    const uint8_t prefix_length_;
-    const optional<Address> next_hop_;
-    const size_t interface_num_;
-    RouteRecord (uint32_t route_prefix, uint8_t prefix_length, optional<Address> next_hop, size_t interface_num)
-    {
-      route_prefix_ = route_prefix;
-      prefix_length_ = prefix_length;
-      next_hop_ = next_hop;
-      interface_num_ = interface_num;
-      if(prefix_length!=0){
-        mask = ((1 << (prefix_length)) - 1) << (32 - prefix_length);
-      }
+public:
+  uint32_t mask = 0;
+  const uint32_t route_prefix_ = 0;
+  const uint8_t prefix_length_ = 0;
+  const optional<Address> next_hop_ = nullopt;
+  const size_t interface_num_ = 0;
+  RouteRecord( uint32_t route_prefix, uint8_t prefix_length, optional<Address> next_hop, size_t interface_num )
+    : route_prefix_( route_prefix )
+    , prefix_length_( prefix_length )
+    , next_hop_( next_hop )
+    , interface_num_( interface_num )
+  {
+    if ( prefix_length != 0 ) {
+      mask = ( ( 1 << ( prefix_length ) ) - 1 ) << ( 32 - prefix_length );
     }
+  }
 };
 
 // A router that has multiple network interfaces and
