@@ -63,7 +63,7 @@ public:
     , interface_num_( interface_num )
   {
     if ( prefix_length != 0 ) {
-      mask = ( ( 1 << ( prefix_length ) ) - 1 ) << ( 32 - prefix_length );
+      mask = 0xffffffff << ( 32 - prefix_length );
     }
   }
 };
